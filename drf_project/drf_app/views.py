@@ -17,3 +17,6 @@ class AccountAPI(ModelViewSet):
     account_services = AccountServicesV1()
     serializer_class = AccountSerializer
     queryset = account_services.get_accounts()
+
+    def perform_create(self, serializer:AccountSerializer):
+        self.account_services.create_account(data=serializer.validated_data)

@@ -1,4 +1,4 @@
-from typing import Protocol
+from typing import Protocol, OrderedDict
 from django.db.models import QuerySet, Sum, Avg, Case, When, Q, F, DecimalField
 from .constants import WalletCurrencyTypes
 
@@ -9,6 +9,9 @@ class AccountRepositoryInterface(Protocol):
     @staticmethod
     def get_accounts() -> QuerySet[Account]: ...
 
+    @staticmethod
+    def create_account(data: OrderedDict) -> None: ...
+
 
 class WalletRepositoryInterface(Protocol):
     @staticmethod
@@ -16,6 +19,7 @@ class WalletRepositoryInterface(Protocol):
 
 
 class AccountRepositoryV1:
+
     @staticmethod
     def get_accounts() -> QuerySet[Account]:
         return Account.objects.prefetch_related('wallets').annotate(
@@ -31,6 +35,14 @@ class AccountRepositoryV1:
             )
 
         )
+
+    @staticmethod
+    def create_account(data: OrderedDict) -> None:
+        wallets = data.pop('wallets')
+        account = Account.objects.create(**data)
+        Wallet.objects.bulk_create([
+            Wallet(**w, account=account) for w in wallets
+        ])
 
 
 class WalletRepositoryV1:

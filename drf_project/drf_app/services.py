@@ -1,4 +1,4 @@
-from typing import Protocol
+from typing import Protocol, OrderedDict
 from django.db.models import QuerySet
 from .models import Account, Wallet
 from . import repository
@@ -8,6 +8,8 @@ class AccountServicesInterface(Protocol):
     account_repository_interface: repository.AccountRepositoryInterface
 
     def get_accounts(self) -> QuerySet[Account]: ...
+
+    def create_account(self, data: OrderedDict) -> None: ...
 
 
 class WalletServicesInterface(Protocol):
@@ -21,6 +23,9 @@ class AccountServicesV1:
 
     def get_accounts(self) -> QuerySet[Account]:
         return self.account_repository.get_accounts()
+
+    def create_account(self, data: OrderedDict) -> None:
+        self.account_repository.create_account(data=data)
 
 
 class WalletServicesV1:
