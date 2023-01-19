@@ -1,7 +1,7 @@
 from typing import Protocol, OrderedDict
-from django.db.models import QuerySet, Sum, Avg, Case, When, Q, F, DecimalField
+from django.db.models import QuerySet, Sum, Case, When, Q, F, DecimalField
 from .constants import WalletCurrencyTypes
-
+from django.db import transaction
 from .models import Account, Wallet
 
 
@@ -37,6 +37,7 @@ class AccountRepositoryV1:
         )
 
     @staticmethod
+    @transaction.atomic()  # в случае ошибки функции, любые изменения в базе данных не применятся - ROLLBACK
     def create_account(data: OrderedDict) -> None:
         wallets = data.pop('wallets')
         account = Account.objects.create(**data)

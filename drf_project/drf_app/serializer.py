@@ -24,8 +24,15 @@ class _AccountWalletSerializer(serializers.ModelSerializer):
 
 class AccountSerializer(serializers.ModelSerializer):
     # wallets = serializers.PrimaryKeyRelatedField(read_only=True,many=True)
-    wallets = _AccountWalletSerializer(write_only=True,many=True)
-    total = serializers.DecimalField(max_digits=14, decimal_places=2,required=False)
+    total = serializers.DecimalField(max_digits=14, decimal_places=2,read_only=True)
+
+    class Meta:
+        model = Account
+        fields = '__all__'
+
+class AccountSerializerV2(serializers.ModelSerializer):
+    wallets = _AccountWalletSerializer(many=True)
+    total = serializers.DecimalField(max_digits=14, decimal_places=2,read_only=True)
 
     class Meta:
         model = Account

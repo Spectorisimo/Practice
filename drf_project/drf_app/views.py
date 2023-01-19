@@ -1,6 +1,6 @@
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.viewsets import ModelViewSet
-from .serializer import AccountSerializer, WalletSerializer
+from .serializer import AccountSerializer, WalletSerializer, AccountSerializerV2
 from .filters import WalletFilter
 from .services import AccountServicesV1, WalletServicesV1
 
@@ -16,6 +16,14 @@ class WalletAPI(ModelViewSet):
 class AccountAPI(ModelViewSet):
     account_services = AccountServicesV1()
     serializer_class = AccountSerializer
+    queryset = account_services.get_accounts()
+
+    # def perform_create(self, serializer:AccountSerializer):
+    #     self.account_services.create_account(data=serializer.validated_data)
+
+class AccountAPIV2(ModelViewSet):
+    account_services = AccountServicesV1()
+    serializer_class = AccountSerializerV2
     queryset = account_services.get_accounts()
 
     def perform_create(self, serializer:AccountSerializer):
