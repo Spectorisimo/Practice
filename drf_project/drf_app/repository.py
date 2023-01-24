@@ -7,7 +7,7 @@ from .models import Account, Wallet
 
 class AccountRepositoryInterface(Protocol):
     @staticmethod
-    def get_accounts() -> QuerySet[Account]: ...
+    def get_accounts(action: str) -> QuerySet[Account]: ...
 
     @staticmethod
     def create_account(data: OrderedDict) -> None: ...
@@ -21,8 +21,12 @@ class WalletRepositoryInterface(Protocol):
 class AccountRepositoryV1:
 
     @staticmethod
-    def get_accounts() -> QuerySet[Account]:
-        return Account.objects.prefetch_related('wallets').annotate(
+    def get_accounts(action: str) -> QuerySet[Account]:
+        accounts = Account.objects.all()
+        if action not in ('list', 'retrieve'):
+            return accounts
+
+        return accounts.prefetch_related('wallets').annotate(
             total=Sum(
                 Case(
                     When(Q(wallets__currency=WalletCurrencyTypes.RUB), then=F('wallets__amount') * 6.7),
